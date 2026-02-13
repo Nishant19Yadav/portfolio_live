@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rock Paper Scissors | Modern Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="game2.css" />
+</head>
+
+<body>
+  <div class="bg-decoration">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <main class="game-container">
+    <header class="game-header">
+      <a href="../index.html" class="back-link">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+        Back
+      </a>
+      <h1>Rock Paper <span class="accent">Scissors</span></h1>
+    </header>
+
+    <section class="score-board glass">
+      <div class="score user">
+        <span class="label">You</span>
+        <p id="user-score">0</p>
+      </div>
+      <div class="divider">VS</div>
+      <div class="score comp">
+        <span class="label">Comp</span>
+        <p id="comp-score">0</p>
+      </div>
+    </section>
+
+    <div class="msg-box glass">
+      <p id="msg">Make your move!</p>
+    </div>
+
+    <div class="choices">
+      <div class="choice glass" id="rock" title="Rock">
+        <div class="choice-icon">👊</div>
+        <img src="./images/rock.png" alt="Rock" />
+      </div>
+      <div class="choice glass" id="paper" title="Paper">
+        <div class="choice-icon">✋</div>
+        <img src="./images/paper.png" alt="Paper" />
+      </div>
+      <div class="choice glass" id="scissors" title="Scissors">
+        <div class="choice-icon">✌️</div>
+        <img src="./images/scissors.png" alt="Scissors" />
+      </div>
+    </div>
+  </main>
+
+  <script src="game2.js"></script>
+</body>
+
+</html>
