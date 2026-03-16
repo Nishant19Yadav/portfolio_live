@@ -213,9 +213,19 @@ contactForm.addEventListener('submit', (e) => {
     document.head.appendChild(style);
 
     // Real API call to Web3Forms
-    // Note: You should replace 'YOUR_ACCESS_KEY_HERE' with a real key from web3forms.com
+    // To make this work, follow these steps:
+    // 1. Go to https://web3forms.com/
+    // 2. Enter your email: nishant.yadav2k06@gmail.com
+    // 3. You will receive an ACCESS KEY in your inbox.
+    // 4. Replace 'YOUR_ACCESS_KEY_HERE' below with that key.
+
     const formDataObj = new FormData(contactForm);
-    formDataObj.append("access_key", "YOUR_ACCESS_KEY_HERE"); // Get one at web3forms.com
+    const accessKey = "262fe3fd-0fc0-43b1-a1e5-adceebf35b54";
+    formDataObj.append("access_key", accessKey);
+
+    // Set from_name to the actual sender's name
+    formDataObj.set("from_name", document.getElementById('name').value);
+
 
     fetch("https://api.web3forms.com/submit", {
         method: "POST",
@@ -232,13 +242,13 @@ contactForm.addEventListener('submit', (e) => {
             `;
                 contactForm.reset();
             } else {
-                console.log(response);
-                submitButton.innerHTML = "Error Occurred";
+                console.error(json);
+                submitButton.innerHTML = `<span>Error: ${json.message || 'Submission failed'}</span>`;
             }
         })
         .catch(error => {
-            console.log(error);
-            submitButton.innerHTML = "Something went wrong";
+            console.error(error);
+            submitButton.innerHTML = "Network Error";
         })
         .then(() => {
             // Reset button after 3 seconds

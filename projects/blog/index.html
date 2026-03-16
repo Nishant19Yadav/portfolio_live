@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inkwell – Modern Blog Platform</title>
+  <meta name="description" content="A sleek modern blogging platform with rich posts an CMS features.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #080810;
+      --surface: #12121e;
+      --surface2: #1a1a28;
+      --border: rgba(255,255,255,0.07);
+      --accent: #c084fc;
+      --accent2: #38bdf8;
+      --text: #e4e4f0;
+      --muted: #7070a0;
+      --green: #34d399;
+    }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+    /* NAV */
+    nav {
+      background:rgba(8,8,16,0.9); backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border); padding:0 2rem;
+      display:flex; align-items:center; justify-content:space-between; height:64px;
+      position:sticky; top:0; z-index:50;
+    }
+    .logo { font-size:1.4rem; font-weight:800; display:flex; align-items:center; gap:0.5rem; }
+    .logo-icon { background:linear-gradient(135deg,#c084fc,#38bdf8); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .nav-right { display:flex; align-items:center; gap:1rem; }
+    .nav-search { background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:0.5rem 1rem; font-family:inherit; font-size:0.85rem; outline:none; width:200px; }
+    .nav-search:focus { border-color:var(--accent); }
+    .write-btn { background:linear-gradient(135deg,#c084fc,#38bdf8); border:none; color:#000; border-radius:10px; padding:0.45rem 1.1rem; font-family:inherit; font-size:0.88rem; font-weight:700; cursor:pointer; transition:all 0.2s; }
+    .write-btn:hover { transform:translateY(-1px); box-shadow:0 4px 15px rgba(192,132,252,0.4); }
+
+    .back-link { display:inline-flex; align-items:center; gap:0.4rem; color:var(--muted); font-size:0.82rem; text-decoration:none; padding:0.75rem 2rem; }
+    .back-link:hover { color:var(--text); }
+
+    /* CATEGORIES BAR */
+    .cats-bar { border-bottom:1px solid var(--border); padding:0 2rem; display:flex; gap:0; align-items:center; overflow-x:auto; }
+    .cats-bar::-webkit-scrollbar { display:none; }
+    .cat-btn { background:none; border:none; color:var(--muted); font-family:inherit; font-size:0.88rem; font-weight:500; cursor:pointer; padding:0.85rem 1rem; border-bottom:2px solid transparent; white-space:nowrap; transition:all 0.2s; }
+    .cat-btn:hover { color:var(--text); }
+    .cat-btn.active { color:var(--accent); border-bottom-color:var(--accent); font-weight:700; }
+
+    /* FEATURED */
+    .featured-section { padding:2rem 2rem 0; max-width:1280px; margin:0 auto; }
+    .featured-hero {
+      background:linear-gradient(135deg, rgba(192,132,252,0.1), rgba(56,189,248,0.08));
+      border:1px solid var(--border); border-radius:20px;
+      padding:2.5rem; display:grid; grid-template-columns:1fr 1fr; gap:2rem;
+      margin-bottom:2rem; position:relative; overflow:hidden;
+    }
+    .featured-hero::after {
+      content:''; position:absolute; right:-100px; top:-100px;
+      width:300px; height:300px; border-radius:50%;
+      background:radial-gradient(circle, rgba(192,132,252,0.08), transparent 70%);
+      pointer-events:none;
+    }
+    .feat-label { display:inline-flex; align-items:center; gap:0.4rem; background:rgba(192,132,252,0.15); color:#c084fc; border:1px solid rgba(192,132,252,0.3); border-radius:20px; padding:0.25rem 0.8rem; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:1rem; }
+    .feat-category { background:rgba(56,189,248,0.15); color:#38bdf8; border:1px solid rgba(56,189,248,0.3); border-radius:20px; padding:0.2rem 0.7rem; font-size:0.73rem; font-weight:700; display:inline-block; margin-bottom:0.75rem; }
+    .feat-title { font-size:1.8rem; font-weight:800; line-height:1.25; margin-bottom:0.75rem; font-family:'Lora',serif; }
+    .feat-excerpt { color:var(--muted); line-height:1.7; margin-bottom:1.25rem; font-size:0.95rem; }
+    .feat-meta { display:flex; align-items:center; gap:1rem; font-size:0.82rem; color:var(--muted); }
+    .author-chip { display:flex; align-items:center; gap:0.5rem; }
+    .avatar { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#c084fc,#38bdf8); display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; color:#000; }
+    .read-btn { background:var(--accent); border:none; color:#000; border-radius:10px; padding:0.6rem 1.4rem; font-family:inherit; font-size:0.9rem; font-weight:700; cursor:pointer; transition:all 0.2s; align-self:flex-start; margin-top:auto; }
+    .read-btn:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(192,132,252,0.4); }
+    .feat-right { display:flex; flex-direction:column; }
+    .feat-right-top { flex:1; }
+    .feat-image { background:linear-gradient(135deg, var(--surface2), #1e1e35); border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:6rem; min-height:200px; }
+
+    /* MAIN LAYOUT */
+    .main-layout { display:grid; grid-template-columns:1fr 320px; gap:2rem; padding:1.5rem 2rem 2rem; max-width:1280px; margin:0 auto; }
+
+    /* POSTS GRID */
+    .posts-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.25rem; }
+    .post-card {
+      background:var(--surface); border:1px solid var(--border); border-radius:16px;
+      overflow:hidden; cursor:pointer; transition:all 0.3s; display:flex; flex-direction:column;
+    }
+    .post-card:hover { transform:translateY(-4px); border-color:rgba(192,132,252,0.3); box-shadow:0 8px 30px rgba(0,0,0,0.4); }
+    .post-thumb { height:140px; display:flex; align-items:center; justify-content:center; font-size:3.5rem; background:linear-gradient(135deg, var(--surface2), #1e1e30); position:relative; }
+    .post-cat-badge { position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.7); border:1px solid var(--border); color:var(--text); border-radius:20px; padding:0.2rem 0.7rem; font-size:0.7rem; font-weight:600; }
+    .post-body { padding:1.1rem; flex:1; display:flex; flex-direction:column; }
+    .post-title { font-size:0.95rem; font-weight:700; line-height:1.4; margin-bottom:0.5rem; font-family:'Lora',serif; }
+    .post-excerpt { font-size:0.82rem; color:var(--muted); line-height:1.6; margin-bottom:0.9rem; flex:1; }
+    .post-footer { display:flex; align-items:center; justify-content:space-between; }
+    .post-meta { font-size:0.75rem; color:var(--muted); }
+    .read-time { font-size:0.75rem; color:var(--accent2); font-weight:600; }
+    .post-tags { display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.6rem; }
+    .post-tag { font-size:0.68rem; padding:0.15rem 0.5rem; border-radius:20px; background:rgba(192,132,252,0.12); color:#c084fc; border:1px solid rgba(192,132,252,0.2); }
+
+    /* SIDEBAR */
+    .sidebar { display:flex; flex-direction:column; gap:1.25rem; }
+    .sidebar-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:1.25rem; }
+    .sidebar-title { font-size:0.8rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); font-weight:700; margin-bottom:1rem; }
+    .trending-item { display:flex; gap:0.75rem; align-items:flex-start; padding:0.6rem 0; border-bottom:1px solid var(--border); cursor:pointer; }
+    .trending-item:last-child { border-bottom:none; }
+    .trending-num { font-size:1.4rem; font-weight:900; color:var(--surface2); line-height:1; min-width:30px; }
+    .trending-title { font-size:0.85rem; font-weight:600; line-height:1.4; margin-bottom:0.2rem; }
+    .trending-meta { font-size:0.73rem; color:var(--muted); }
+    .trending-item:hover .trending-title { color:var(--accent); }
+
+    .tag-cloud { display:flex; flex-wrap:wrap; gap:0.5rem; }
+    .tag-chip { background:var(--surface2); border:1px solid var(--border); color:var(--muted); border-radius:20px; padding:0.3rem 0.8rem; font-size:0.78rem; cursor:pointer; transition:all 0.2s; }
+    .tag-chip:hover { background:rgba(192,132,252,0.15); border-color:rgba(192,132,252,0.4); color:var(--accent); }
+
+    .newsletter-form { display:flex; flex-direction:column; gap:0.75rem; }
+    .nl-input { background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:0.6rem 0.9rem; font-family:inherit; font-size:0.85rem; outline:none; width:100%; }
+    .nl-input:focus { border-color:var(--accent); }
+    .nl-btn { background:linear-gradient(135deg,#c084fc,#38bdf8); border:none; color:#000; border-radius:10px; padding:0.6rem; font-family:inherit; font-weight:700; cursor:pointer; width:100%; font-size:0.9rem; }
+    .nl-desc { font-size:0.78rem; color:var(--muted); }
+
+    /* POST MODAL */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:200; opacity:0; pointer-events:none; transition:opacity 0.3s; overflow-y:auto; display:flex; justify-content:center; padding:2rem; }
+    .modal-overlay.open { opacity:1; pointer-events:all; }
+    .post-modal { background:var(--surface); border:1px solid var(--border); border-radius:20px; max-width:720px; width:100%; align-self:flex-start; overflow:hidden; transform:translateY(20px); transition:transform 0.3s; }
+    .modal-overlay.open .post-modal { transform:translateY(0); }
+    .post-modal-header { padding:2rem 2rem 1.5rem; border-bottom:1px solid var(--border); }
+    .post-modal-close { float:right; background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:0.35rem 0.8rem; cursor:pointer; font-size:0.85rem; }
+    .post-modal-cat { display:inline-block; margin-bottom:0.75rem; }
+    .post-modal-title { font-family:'Lora',serif; font-size:2rem; font-weight:700; line-height:1.25; margin-bottom:1rem; }
+    .post-modal-meta { display:flex; align-items:center; gap:1.25rem; font-size:0.82rem; color:var(--muted); flex-wrap:wrap; }
+    .post-modal-body { padding:2rem; font-size:0.97rem; line-height:1.85; color:#ccc; }
+    .post-modal-body h2 { font-family:'Lora',serif; font-size:1.4rem; color:var(--text); margin:1.5rem 0 0.75rem; }
+    .post-modal-body h3 { font-size:1.1rem; color:var(--text); margin:1.25rem 0 0.5rem; }
+    .post-modal-body p { margin-bottom:1rem; }
+    .post-modal-body code { background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:0.15rem 0.5rem; font-size:0.88rem; color:#c084fc; }
+    .post-modal-body pre { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:1.25rem; margin:1rem 0; overflow-x:auto; }
+    .post-modal-body pre code { background:none; border:none; padding:0; color:#a78bfa; font-size:0.85rem; }
+    .post-modal-body blockquote { border-left:3px solid var(--accent); background:rgba(192,132,252,0.06); padding:1rem 1.25rem; border-radius:0 10px 10px 0; margin:1rem 0; font-style:italic; color:#aaa; }
+    .post-modal-body ul { padding-left:1.5rem; margin-bottom:1rem; }
+    .post-modal-body li { margin-bottom:0.4rem; }
+
+    /* WRITE MODAL */
+    .write-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; display:flex; align-items:center; justify-content:center; }
+    .write-overlay.open { opacity:1; pointer-events:all; }
+    .write-modal { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:2rem; width:620px; max-width:95vw; transform:scale(0.9); transition:transform 0.3s; }
+    .write-overlay.open .write-modal { transform:scale(1); }
+    .write-modal h2 { font-size:1.2rem; font-weight:800; margin-bottom:1.5rem; }
+    .form-group { margin-bottom:1rem; }
+    .form-label { display:block; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin-bottom:0.4rem; }
+    .form-input,.form-textarea,.form-select { width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:0.65rem 0.9rem; font-family:inherit; font-size:0.9rem; outline:none; transition:border-color 0.2s; }
+    .form-input:focus,.form-textarea:focus,.form-select:focus { border-color:var(--accent); }
+    .form-textarea { resize:vertical; min-height:120px; line-height:1.6; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    .modal-actions { display:flex; gap:0.75rem; justify-content:flex-end; margin-top:1.5rem; }
+    .btn-cancel { background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:0.6rem 1.2rem; font-family:inherit; cursor:pointer; }
+    .btn-publish { background:linear-gradient(135deg,#c084fc,#38bdf8); border:none; color:#000; border-radius:10px; padding:0.6rem 1.5rem; font-family:inherit; font-weight:700; cursor:pointer; }
+
+    /* TOAST */
+    .toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(80px); background:var(--green); color:#000; padding:0.75rem 1.5rem; border-radius:30px; font-weight:700; font-size:0.9rem; z-index:400; transition:transform 0.3s; }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+
+    .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; }
+    .section-header h2 { font-size:1.1rem; font-weight:800; }
+    .view-all { font-size:0.82rem; color:var(--accent); text-decoration:none; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">✒️ <span class="logo-icon">Inkwell</span></div>
+  <div class="nav-right">
+    <input class="nav-search" type="text" id="navSearch" placeholder="Search articles…" oninput="filterPosts()">
+    <button class="write-btn" onclick="openWrite()">✏️ Write</button>
+  </div>
+</nav>
+
+<a href="../../index.html" class="back-link">← Back to Portfolio</a>
+
+<!-- CATEGORIES -->
+<div class="cats-bar" id="catsBar"></div>
+
+<div class="featured-section">
+  <!-- FEATURED POST -->
+  <div class="featured-hero" id="featHero"></div>
+</div>
+
+<div class="main-layout">
+  <div>
+    <div class="section-header">
+      <h2>Latest Articles</h2>
+      <span style="font-size:0.82rem;color:var(--muted);" id="postsCountLabel"></span>
+    </div>
+    <div class="posts-grid" id="postsGrid"></div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-title">🔥 Trending</div>
+      <div id="trendingList"></div>
+    </div>
+    <div class="sidebar-card">
+      <div class="sidebar-title">🏷️ Popular Tags</div>
+      <div class="tag-cloud" id="tagCloud"></div>
+    </div>
+    <div class="sidebar-card">
+      <div class="sidebar-title">📩 Newsletter</div>
+      <p class="nl-desc" style="margin-bottom:0.75rem;">Get the best articles delivered to your inbox weekly.</p>
+      <div class="newsletter-form">
+        <input type="email" class="nl-input" placeholder="your@email.com" id="nlEmail">
+        <button class="nl-btn" onclick="subscribe()">Subscribe →</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- READ POST MODAL -->
+<div class="modal-overlay" id="postModal" onclick="closeModal(event)">
+  <div class="post-modal" id="postModalContent"></div>
+</div>
+
+<!-- WRITE MODAL -->
+<div class="write-overlay" id="writeModal" onclick="closeWrite(event)">
+  <div class="write-modal">
+    <h2>✒️ Write New Article</h2>
+    <div class="form-group">
+      <label class="form-label">Title *</label>
+      <input type="text" class="form-input" id="wTitle" placeholder="Your article title…">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="wCat">
+          <option>Technology</option><option>Development</option><option>Design</option>
+          <option>Career</option><option>AI & ML</option><option>Open Source</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Emoji</label>
+        <input type="text" class="form-input" id="wEmoji" placeholder="e.g. 🚀" value="📝">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Excerpt</label>
+      <input type="text" class="form-input" id="wExcerpt" placeholder="Short description…">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Content</label>
+      <textarea class="form-textarea" id="wContent" placeholder="Write your article here… (supports basic Markdown)"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeWriteDirect()">Cancel</button>
+      <button class="btn-publish" onclick="publishPost()">Publish Article</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const categories = ['All', 'Technology', 'Development', 'Design', 'Career', 'AI & ML', 'Open Source'];
+let activeCategory = 'All';
+let nextId = 100;
+
+const posts = [
+  {
+    id:1, title:'Building Scalable APIs with Node.js and Express', category:'Development',
+    emoji:'⚙️', excerpt:'A deep dive into best practices for building production-ready REST APIs, from authentication to rate limiting and caching strategies.',
+    author:'Nishant Singh', date:'Mar 10, 2026', readTime:'8 min', tags:['Node.js','Express','REST API','Backend'],
+    featured:true,
+    content:`<h2>Introduction</h2><p>Building a scalable API is more than just writing endpoints. It requires thoughtful architecture, proper error handling, and performance considerations from day one.</p><h2>Project Structure</h2><p>A well-organized project structure is crucial for maintainability. Here's a battle-tested pattern:</p><pre><code>src/
+  controllers/   # Route handlers
+  middleware/    # Auth, validation, rate limiting
+  models/        # Database schemas
+  routes/        # Route definitions
+  services/      # Business logic
+  utils/         # Helpers & utilities</code></pre><h2>Authentication with JWT</h2><p>JSON Web Tokens provide a stateless, scalable authentication mechanism. Here's a simple middleware:</p><pre><code>const jwt = require('jsonwebtoken');
+
+const authMiddleware = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+  
+  try {
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    next();
+  } catch (e) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+};</code></pre><h2>Rate Limiting</h2><p>Prevent abuse by implementing rate limiting with <code>express-rate-limit</code>:</p><blockquote>Rate limiting is your API's first line of defense against brute-force attacks and DDoS attempts. Never skip it in production.</blockquote><h2>Error Handling</h2><p>A centralized error handler keeps your code clean and responses consistent. Always distinguish between operational errors (expected) and programming errors (unexpected).</p><h2>Caching Strategies</h2><p>Use Redis for response caching on frequently-hit endpoints. A cache hit can be 100x faster than a database query.</p><ul><li>Cache at the route level for static data</li><li>Use cache invalidation patterns carefully</li><li>Set appropriate TTLs based on data freshness requirements</li></ul><h2>Conclusion</h2><p>Building a scalable API is an iterative process. Start simple, measure performance, and optimize based on real traffic patterns.</p>`
+  },
+  {
+    id:2, title:'Mastering CSS Grid: From Basics to Advanced Layouts', category:'Design',
+    emoji:'🎨', excerpt:'Everything you need to know about CSS Grid — from simple two-column layouts to complex magazine-style designs.',
+    author:'Priya Sharma', date:'Mar 12, 2026', readTime:'6 min', tags:['CSS','Grid','Frontend','Design'],
+    content:`<h2>Why CSS Grid?</h2><p>CSS Grid is a two-dimensional layout system designed for both rows and columns. It's the most powerful layout tool in modern CSS, making previously complex layouts trivial.</p><h2>Basic Concepts</h2><p>A grid container establishes a new grid formatting context for its children. The core terminology:</p><ul><li><strong>Grid Container:</strong> The element with <code>display: grid</code></li><li><strong>Grid Items:</strong> Direct children of the container</li><li><strong>Grid Lines:</strong> The dividing lines that make up the grid structure</li><li><strong>Grid Cell:</strong> The intersection of a row and column</li></ul><pre><code>.container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto;
+  gap: 1rem;
+}</code></pre><h2>The fr Unit</h2><p>The <code>fr</code> (fraction) unit is Grid's secret weapon. It distributes available space proportionally, making fluid layouts effortless.</p><h2>Named Grid Areas</h2><blockquote>Named grid areas make complex layouts self-documenting. Your CSS reads like a visual blueprint of your design.</blockquote><pre><code>.layout {
+  grid-template-areas:
+    "header header header"
+    "sidebar main main"
+    "footer footer footer";
+}</code></pre><h2>Responsive Grids</h2><p>Combine Grid with <code>auto-fill</code> and <code>minmax()</code> for layouts that adapt without media queries:</p><pre><code>grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));</code></pre><p>This single line creates a responsive grid that fits as many columns as possible while keeping each at least 280px wide. Magic!</p>`
+  },
+  {
+    id:3, title:'The Future of AI in Software Development', category:'AI & ML',
+    emoji:'🤖', excerpt:'How large language models are transforming the development workflow — from code generation to automated testing and documentation.',
+    author:'Nishant Singh', date:'Mar 14, 2026', readTime:'10 min', tags:['AI','LLM','Future','Productivity'],
+    content:`<h2>The AI Developer Revolution</h2><p>We're living through the most significant shift in software development since the introduction of high-level programming languages. AI coding assistants are no longer novelties — they're becoming indispensable tools.</p><h2>Code Generation</h2><p>Modern LLMs can generate boilerplate code, implement algorithms, and even architect entire modules based on natural language descriptions. But they're not replacing developers — they're making them 2-5x more productive.</p><blockquote>The developers who will thrive are those who learn to collaborate with AI, not those who resist it.</blockquote><h2>Automated Testing</h2><p>AI can generate comprehensive test suites from function signatures and docstrings. What used to take hours now takes minutes, and coverage rates are improving dramatically.</p><h2>Code Review & Bug Detection</h2><p>Static analysis powered by LLMs can catch subtle bugs, security vulnerabilities, and anti-patterns that traditional linters miss. The models understand intent, not just syntax.</p><h2>Documentation</h2><ul><li>Auto-generated README files from codebases</li><li>Inline docstrings from function implementations</li><li>API documentation from route definitions</li><li>Architecture diagrams from code structure</li></ul><h2>The Human Element</h2><p>Despite these advances, human creativity, problem decomposition, and system thinking remain irreplaceable. The best software will always require human judgment for architecture decisions, UX considerations, and business logic.</p><h2>Preparing for Tomorrow</h2><p>Learn to write effective prompts, understand AI outputs critically, and focus your energy on high-level architecture and creative problem solving. The future belongs to AI-augmented developers.</p>`
+  },
+  {
+    id:4, title:'Open Source Contribution: A Beginner\'s Complete Guide', category:'Open Source',
+    emoji:'🌐', excerpt:'Step-by-step guide to making your first open source contribution — from finding the right project to getting your PR merged.',
+    author:'Raj Patel', date:'Mar 8, 2026', readTime:'7 min', tags:['Git','GitHub','Open Source','Community'],
+    content:`<h2>Why Contribute to Open Source?</h2><p>Open source contribution is one of the fastest ways to level up as a developer. You get to work on real codebases, collaborate with experienced engineers, and build a public portfolio that employers actually look at.</p><h2>Finding Your First Project</h2><p>The key is to start small. Look for issues labeled <code>good first issue</code> or <code>beginner-friendly</code> on GitHub. Tools like <strong>goodfirstissue.dev</strong> curate these across thousands of repositories.</p><h2>Setting Up Your Environment</h2><pre><code># Fork the repository on GitHub, then:
+git clone https://github.com/YOUR_USERNAME/REPO_NAME
+cd REPO_NAME
+git remote add upstream https://github.com/ORIGINAL_OWNER/REPO_NAME
+
+# Create a feature branch
+git checkout -b fix/issue-description</code></pre><h2>Making Quality Contributions</h2><ul><li>Read the CONTRIBUTING.md thoroughly</li><li>Keep PRs focused — one issue, one PR</li><li>Write clear commit messages</li><li>Add tests for your changes</li><li>Update documentation if needed</li></ul><blockquote>Your PR description should explain the "why" not just the "what". Maintainers review dozens of PRs — make theirs easy.</blockquote><h2>After Your PR is Merged</h2><p>Celebrate! Then keep going. Become a regular contributor to projects you care about. Many open source careers started with a single typo fix.</p>`
+  },
+  {
+    id:5, title:'React 19: What\'s New and What It Means for Developers', category:'Technology',
+    emoji:'⚛️', excerpt:'A comprehensive look at React 19\'s server components, the new compiler, and how these changes affect your day-to-day development.',
+    author:'Nishant Singh', date:'Mar 6, 2026', readTime:'9 min', tags:['React','JavaScript','Frontend','Web'],
+    content:`<h2>The Biggest React Release in Years</h2><p>React 19 marks a fundamental shift in how we think about React applications. With server components becoming stable and the React compiler handling optimization automatically, the mental model is changing.</p><h2>Server Components</h2><p>Server Components run exclusively on the server, with zero JavaScript shipped to the client. This is a game-changer for performance-critical applications.</p><pre><code>// This runs on the server, no client bundle
+async function ProductList() {
+  const products = await db.products.findMany();
+  return products.map(p => <ProductCard key={p.id} {...p} />);
+}
+
+// Client component for interactivity
+'use client';
+function AddToCartButton({ productId }) {
+  return <button onClick={() => addToCart(productId)}>Add</button>;
+}</code></pre><h2>The React Compiler</h2><p>The new compiler automatically applies memoization, eliminating the need for <code>useMemo</code>, <code>useCallback</code>, and manual <code>React.memo</code> in most cases.</p><blockquote>The compiler understands React's rules better than most humans. Let it optimize. You focus on features.</blockquote><h2>New Hooks</h2><ul><li><code>use()</code> — Read resources like Promises and Context</li><li><code>useFormStatus()</code> — Access parent form state</li><li><code>useOptimistic()</code> — Optimistic UI updates</li><li><code>useActionState()</code> — Handle async form actions</li></ul><h2>Migration Path</h2><p>React 19 is largely backward compatible. Start by enabling the compiler and progressively adopt server components in new features rather than migrating all at once.</p>`
+  },
+  {
+    id:6, title:'Landing Your First Developer Job: The Real Guide', category:'Career',
+    emoji:'💼', excerpt:'What nobody tells you about job hunting as a junior developer — from building your portfolio to acing technical interviews and negotiating salary.',
+    author:'Priya Sharma', date:'Mar 4, 2026', readTime:'12 min', tags:['Career','Interview','Jobs','Growth'],
+    content:`<h2>The Truth About Junior Developer Hiring</h2><p>The job market for junior developers is competitive but far from closed. Companies are always looking for motivated developers who can learn quickly and communicate effectively.</p><h2>Your Portfolio is Your Resume</h2><p>A strong portfolio beats a strong resume. Hiring managers spend 30 seconds on a resume but minutes exploring interesting projects. Build things that solve real problems, not just tutorial clones.</p><blockquote>The best portfolio project is one you'd actually use yourself. Passion shows through code.</blockquote><h2>What to Build</h2><ul><li>A full-stack application with authentication</li><li>Something with real data (API integration)</li><li>A project with a deployed, shareable URL</li><li>Code that's actually readable (README, comments)</li></ul><h2>The Technical Interview</h2><p>Practice data structures and algorithms, but don't neglect the practical stuff. Many companies now do take-home projects or live coding on real code. LeetCode is useful, but building projects is better.</p><h2>Networking</h2><p>80% of jobs are never posted publicly. Attend meetups, contribute to open source, be active on Twitter/LinkedIn. A warm referral is worth 10 cold applications.</p><h2>Salary Negotiation</h2><p>Always negotiate. Always. The first offer is rarely the best offer. Research market rates on levels.fyi and glassdoor. Silence after stating your number is a negotiating tool.</p><h2>Your First 90 Days</h2><p>Even more important than landing the job is succeeding at it. Ask lots of questions, deliver on small tasks, and build relationships. Junior developers who thrive get promoted.</p>`
+  },
+];
+
+function makeTagClass(cat) {
+  const map = { Technology:'tag-purple', Development:'tag-blue', Design:'tag-pink', Career:'tag-yellow', 'AI & ML':'tag-green', 'Open Source':'tag-red' };
+  return map[cat] || 'tag-purple';
+}
+
+function renderCats() {
+  const bar = document.getElementById('catsBar');
+  bar.innerHTML = categories.map(c => `<button class="cat-btn ${c===activeCategory?'active':''}" onclick="setCategory('${c}')">${c}</button>`).join('');
+}
+
+function setCategory(cat) {
+  activeCategory = cat;
+  renderCats();
+  renderPosts();
+}
+
+function filteredPosts() {
+  const q = document.getElementById('navSearch').value.toLowerCase();
+  return [].concat(posts).filter(p =>
+    (activeCategory === 'All' || p.category === activeCategory) &&
+    (p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || p.tags.some(t => t.toLowerCase().includes(q)))
+  ).sort((a,b) => b.id - a.id);
+}
+
+function filterPosts() { renderPosts(); }
+
+function renderFeatured() {
+  const p = posts.find(x => x.featured) || posts[0];
+  document.getElementById('featHero').innerHTML = `
+    <div style="display:flex;flex-direction:column;">
+      <span class="feat-label">⭐ Featured</span>
+      <span class="feat-category">${p.category}</span>
+      <div class="feat-title">${p.title}</div>
+      <div class="feat-excerpt">${p.excerpt}</div>
+      <div class="feat-meta">
+        <div class="author-chip"><div class="avatar">${p.author.slice(0,2)}</div>${p.author}</div>
+        <span>📅 ${p.date}</span><span>⏱ ${p.readTime} read</span>
+      </div>
+      <div style="margin-top:1.25rem;">
+        <button class="read-btn" onclick="openPost(${p.id})">Read Article →</button>
+      </div>
+    </div>
+    <div class="feat-right">
+      <div class="feat-image">${p.emoji}</div>
+      <div class="post-tags" style="margin-top:1rem;">${p.tags.map(t=>`<span class="post-tag">${t}</span>`).join('')}</div>
+    </div>`;
+}
+
+function renderPosts() {
+  const list = filteredPosts();
+  document.getElementById('postsCountLabel').textContent = `${list.length} article${list.length!==1?'s':''}`;
+  const grid = document.getElementById('postsGrid');
+  if (list.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--muted)"><div style="font-size:2.5rem;margin-bottom:1rem">🔍</div><p>No articles found. Try a different search or category.</p></div>`;
+    return;
+  }
+  grid.innerHTML = list.map(p => `
+    <div class="post-card" onclick="openPost(${p.id})">
+      <div class="post-thumb">${p.emoji}<span class="post-cat-badge">${p.category}</span></div>
+      <div class="post-body">
+        <div class="post-tags">${p.tags.slice(0,3).map(t=>`<span class="post-tag">${t}</span>`).join('')}</div>
+        <div class="post-title">${p.title}</div>
+        <div class="post-excerpt">${p.excerpt}</div>
+        <div class="post-footer">
+          <div class="post-meta">${p.author} · ${p.date}</div>
+          <div class="read-time">⏱ ${p.readTime}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderTrending() {
+  document.getElementById('trendingList').innerHTML = [...posts].slice(0,4).map((p,i)=>`
+    <div class="trending-item" onclick="openPost(${p.id})">
+      <div class="trending-num">0${i+1}</div>
+      <div>
+        <div class="trending-title">${p.title}</div>
+        <div class="trending-meta">${p.readTime} read • ${p.category}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderTagCloud() {
+  const tags = [...new Set(posts.flatMap(p => p.tags))];
+  document.getElementById('tagCloud').innerHTML = tags.map(t => `<span class="tag-chip" onclick="document.getElementById('navSearch').value='${t}';filterPosts()">${t}</span>`).join('');
+}
+
+function openPost(id) {
+  const p = [...posts].concat(posts).find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('postModalContent').innerHTML = `
+    <div class="post-modal-header">
+      <button class="post-modal-close" onclick="document.getElementById('postModal').classList.remove('open')">✕ Close</button>
+      <span class="feat-category post-modal-cat">${p.category}</span>
+      <div class="post-modal-title">${p.title}</div>
+      <div class="post-modal-meta">
+        <div class="author-chip"><div class="avatar">${p.author.slice(0,2)}</div>${p.author}</div>
+        <span>📅 ${p.date}</span><span>⏱ ${p.readTime}</span>
+        <div class="post-tags" style="display:flex;gap:0.4rem;flex-wrap:wrap">${p.tags.map(t=>`<span class="post-tag">${t}</span>`).join('')}</div>
+      </div>
+    </div>
+    <div class="post-modal-body">${p.content}</div>`;
+  document.getElementById('postModal').classList.add('open');
+}
+function closeModal(e) { if (e.target.id === 'postModal') document.getElementById('postModal').classList.remove('open'); }
+
+function openWrite() { document.getElementById('writeModal').classList.add('open'); }
+function closeWrite(e) { if (e.target.id === 'writeModal') closeWriteDirect(); }
+function closeWriteDirect() { document.getElementById('writeModal').classList.remove('open'); }
+
+function publishPost() {
+  const title = document.getElementById('wTitle').value.trim();
+  if (!title) { document.getElementById('wTitle').style.borderColor='#ef4444'; return; }
+  document.getElementById('wTitle').style.borderColor='';
+  const tagMap = { Technology:['#tag-purple'], Development:['Backend','Frontend'], Design:['UI','CSS'], Career:['Jobs'], 'AI & ML':['AI'], 'Open Source':['GitHub'] };
+  const cat = document.getElementById('wCat').value;
+  posts.unshift({
+    id: nextId++,
+    title,
+    category: cat,
+    emoji: document.getElementById('wEmoji').value || '📝',
+    excerpt: document.getElementById('wExcerpt').value || 'A new article on ' + cat + '.',
+    author: 'Nishant Singh',
+    date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+    readTime: '5 min',
+    tags: (tagMap[cat] || ['New']).concat([cat]),
+    content: `<p>${document.getElementById('wContent').value || 'Article content goes here…'}</p>`,
+  });
+  closeWriteDirect();
+  renderPosts();
+  renderTrending();
+  renderTagCloud();
+  showToast('🎉 Article published successfully!');
+  document.getElementById('wTitle').value=''; document.getElementById('wExcerpt').value=''; document.getElementById('wContent').value='';
+}
+
+function subscribe() {
+  const email = document.getElementById('nlEmail').value;
+  if (!email || !email.includes('@')) return;
+  document.getElementById('nlEmail').value = '';
+  showToast('📩 Subscribed! Welcome to Inkwell.');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Init
+renderCats();
+renderFeatured();
+renderPosts();
+renderTrending();
+renderTagCloud();
+</script>
+</body>
+</html>
